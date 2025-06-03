@@ -1,0 +1,167 @@
+  <!DOCTYPE html>
+  <html>
+    <head>
+  <link rel="manifest" href="/manifest.json">
+      <link href="css/icon.css" rel="stylesheet">
+      <link type="text/css" rel="stylesheet" href="css/materialize.min.css?v=2.4.2"  media="screen,projection"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <script src="js/jquery.min.js"></script>
+      <script src="js/scripts.js?v=2.4.2"></script>
+      <script src="js/core.js"></script>
+      <script src="js/md5.js"></script>
+      <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+      <meta charset="UTF-8">
+      <meta name="color-scheme" content="light only">
+      <script type="text/javascript">
+
+        function cargar()
+        {
+          var token = obtenerParametros('token');
+          $('#token').val(token);
+        }
+
+        function iniciar()
+        {
+          var status = navigator.onLine;
+          if (!status) {
+              alert('Es necesario conectarse a internet para continuar. Revise su conexión y reintente.');
+              window.close();
+          } else {
+            var token = localStorage.getItem('token');
+            var inmo = localStorage.getItem('inmobiliaria');
+            var suc = localStorage.getItem('sucursal');
+            var rol = localStorage.getItem('rol');
+
+            if(token !== null)
+            {
+              window.location.href = "busqueda.html?token=" + token + "&inmobiliaria=" + inmo + "&sucursal=" + suc + "&rol=" + rol;
+            }
+          }
+        }
+
+        function iniciarSesion()
+        {
+          var token = $('#token').val();
+          if(token !== "")
+          {
+            M.toast({html: 'Guardando sus datos...'});
+            
+
+            localStorage.setItem('token', token);
+
+            var request = new XMLHttpRequest();
+
+            url = 'https://apmovil.som.com.ar/InmobiliariasServiceV2.aspx?token=' + token;
+
+            request.open('GET', url, true);
+
+            request.onload = function() {
+
+              var login = JSON.parse(this.response);
+
+              if (request.status >= 200 && request.readyState == 4) {
+                if(!Boolean(login))
+                {
+                  M.toast({html: 'Los datos ingresados no son correctos.'});  
+                }
+                else
+                {
+                  if(login.codigo !== "")
+                  {
+                    localStorage.setItem('inmobiliaria', login.inmobiliaria);
+                    localStorage.setItem('sucursal', login.sucursal);
+                    localStorage.setItem('rol', login.rolUsuario);
+                    window.location.href = "busqueda.html?token=" + token + "&inmobiliaria=" + login.inmobiliaria + "&sucursal=" + login.sucursal + "&rol=" + login.rolUsuario;
+                  }
+                }
+                
+              }
+            }
+
+            request.send();
+          }
+          else
+          {
+            M.toast({html: 'Debe ingresar un token para continuar.'});
+          }
+        }
+      </script>
+    </head>
+
+    <body class="fondo" onload="cargar()">
+
+      <div class="row">
+        <div class="col s12 center-align">
+
+            <img src="images/logo.png" class="responsive-img" style="margin-top: 40px; margin-bottom: 50px">
+            
+            <!-- <div class="input-field col s12">
+              <input type="text" id="usuario" placeholder="">
+              <label for="usuario">Usuario</label>
+            </div>
+            
+            <div class="input-field col s12">
+              <input type="password" id="password" placeholder="">
+              <label for="password">Contraseña</label>
+            </div> -->
+
+            <h4>Para cambiar su Token, ingrese el nuevo y presione grabar.</h4>
+            <br>
+           
+            <div class="input-field col s12">
+              <br>
+              <input type="text" id="token" class="browser-default" style="height: 35px; width: 100%; font-size: 20px" placeholder="">
+              <label for="token">Ingrese su Token</label>
+            </div>
+
+            <br>
+            <a href="javascript:iniciar()" class="margin btn blue-grey"><i class="material-icons left">arrow_back</i>Salir</a>
+
+            <a href="javascript:iniciarSesion();" class="margin btn blue-grey"><i class="material-icons right">save</i>Grabar</a>
+        </div>
+        <div class="col s12 center-align" id="version">
+          <br><br>
+        </div>
+      </div>
+      <script type="text/javascript">
+        $("#version").html("");
+        /*var mensajeOS = "Apple iOS - ";
+
+        if(isAndroid)
+        {
+          mensajeOS = "Android - ";
+        }*/
+
+        const userAgent = navigator.userAgent;
+        var mensajeOS = "";
+
+        if (/Windows NT 10.0/.test(userAgent)) {
+          mensajeOS = "Windows - ";
+        } 
+        if (/Macintosh/.test(userAgent)) {
+          mensajeOS = "Mac OS - ";
+        }
+        if (/Linux/.test(userAgent)) {
+          mensajeOS = "Linux - ";
+        }
+        if (/Android/.test(userAgent)) {
+          mensajeOS = "Android - ";
+        }
+        if (/iPhone|iPad|iPod/.test(userAgent)) {
+          mensajeOS = "iOS - ";
+        }
+
+        $("#version").append("<br><br><br><span>Versión de la aplicación: <b class='red-text'>" + mensajeOS + versionAPP  + "</b></span>");
+      </script>
+      <script type="text/javascript" src="js/materialize.min.js"></script>
+    
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker registrado con éxito'))
+        .catch(error => console.log('Error al registrar Service Worker:', error));
+    }
+  </script>
+
+</body>
+  </html>

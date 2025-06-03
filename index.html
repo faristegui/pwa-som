@@ -1,0 +1,19 @@
+<html>
+	<script type="text/javascript">
+		var token = localStorage.getItem('token');
+        var inmo = localStorage.getItem('inmobiliaria');
+        var sucursal = localStorage.getItem('sucursal');
+        var rol = localStorage.getItem('rol');
+
+        var timestamp = new Date().getTime();
+
+        if(token !== null && inmo !== null)
+        {
+          	window.location.href = "busqueda.html?" + timestamp + "&token=" + token + "&inmobiliaria=" + inmo + "&sucursal=" + sucursal + "&rol=" + rol;
+        }
+        else
+        {
+        	window.location.href = "login.html?" + timestamp;
+        }
+	</script>
+</html>
